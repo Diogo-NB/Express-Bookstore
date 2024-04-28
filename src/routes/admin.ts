@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import rootDir from '../util/path';
+// import rootDir from '../util/path';
 
 export const router = express.Router();
 
@@ -11,7 +11,8 @@ export type Product = {
 export const products: Product[] = [];
 
 router.get('/add-product', (req, res, next) => {
-    res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
+    res.render('add-product', {docTitle: 'Add Product'});
+    // res.sendFile(path.join(rootDir, 'views', 'add-product.html'));
 });
 
 router.post('/add-product', (req, res, next) => {
