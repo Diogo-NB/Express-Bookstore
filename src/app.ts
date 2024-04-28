@@ -1,10 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import path from 'path';
+import rootDir from './util/path'
 
 import { router as adminRoutes } from './routes/admin';
 import { router as shopRoutes } from './routes/shop';
-import path from 'path';
-import { rootDir } from './util/path'
 
 const app = express();
 
