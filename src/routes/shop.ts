@@ -6,6 +6,6 @@ import { products } from '../routes/admin'
 export const router = express.Router();
 
 router.get('/', (req, res, next) => {
-    res.render('shop', { prods: products, docTitle: 'My Shop' });
+    res.render('shop', { prods: products, pageTitle: 'My Shop', path: '/' });
     // res.sendFile(path.join(rootDir, 'views', 'shop.html'));
 });
