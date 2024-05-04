@@ -21,7 +21,6 @@ app.use(shopRoutes);
 
 app.use((req, res, next) => {
     res.render('404', { pageTitle: 'Page not found!', path: '404' });
-    // res.status(404).sendFile(path.join(rootDir, 'views', '404.html'));
 })
 
 // Create a local server to receive data from

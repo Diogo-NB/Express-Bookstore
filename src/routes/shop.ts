@@ -1,11 +1,6 @@
 import express from 'express';
-import path from 'path';
-// import rootDir from '../util/path';
-import { products } from '../routes/admin'
+import ProductsController from '../controllers/products'
 
 export const router = express.Router();
 
-router.get('/', (req, res, next) => {
-    res.render('shop', { prods: products, pageTitle: 'My Shop', path: '/' });
-    // res.sendFile(path.join(rootDir, 'views', 'shop.html'));
-});
+router.get('/', ProductsController.getShop);
