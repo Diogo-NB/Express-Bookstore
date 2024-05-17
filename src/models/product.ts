@@ -6,6 +6,8 @@ const filePath = path.join(path.dirname(rootDir), 'data', 'products.json');
 
 export default class Product {
 
+    id : string = '';
+
     constructor(
         public title: string,
         public imageUrl: string,
@@ -18,6 +20,7 @@ export default class Product {
     }
 
     save() {
+        this.id = Math.random().toString();
         console.log('Saving product... ' + this.toString());
         fs.readFile(filePath).then((fileContent) => {
             let products = JSON.parse(fileContent.toString()) as Product[];
@@ -34,6 +37,10 @@ export default class Product {
             console.log(message);
             return [];
         }
+    }
+
+    static async findById(id: string): Promise<Product | undefined> {
+        return (await Product.fetchAll()).find(p => p.id === id);
     }
 
 }
