@@ -6,13 +6,19 @@ const filePath = path.join(path.dirname(rootDir), 'data', 'products.json');
 
 export default class Product {
 
-    title: string;
+    constructor(
+        public title: string,
+        public imageUrl: string,
+        public description: string,
+        public price: number
+    ) { }
 
-    constructor(title: string) {
-        this.title = title;
+    toString() {
+        return `Title: ${this.title}\nImage URL: ${this.imageUrl}\nDescription: ${this.description}\nPrice: ${this.price}`;
     }
 
     save() {
+        console.log('Saving product... ' + this.toString());
         fs.readFile(filePath).then((fileContent) => {
             let products = JSON.parse(fileContent.toString()) as Product[];
             products.push(this);
