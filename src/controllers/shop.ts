@@ -34,4 +34,11 @@ export default class ShopController {
         )
     }
 
+    static getOrders(_req: any, res: any, _next: any) {
+        res.render(
+            'shop/orders',
+            { pageTitle: 'Your Orders', path: '/orders' }
+        )
+    }
+
 };
