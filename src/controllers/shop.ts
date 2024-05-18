@@ -1,3 +1,4 @@
+import Cart from '../models/cart';
 import Product from '../models/product';
 
 export default class ShopController {
@@ -41,8 +42,14 @@ export default class ShopController {
     }
 
     static postCart(req: any, res: any, _next: any) {
-        let id : string = req.body.productID;
-        console.log(id);
+        let id: string = req.body.productID;
+        Product.findById(id).then((product) => {
+            if (product) {
+                Cart.addProduct(product).then(() => {
+                    console.log('Product added to cart');
+                }).catch(console.log);
+            }
+        });
         res.redirect('/cart');
     }
 

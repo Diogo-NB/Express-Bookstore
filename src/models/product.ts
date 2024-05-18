@@ -6,7 +6,7 @@ const filePath = path.join(path.dirname(rootDir), 'data', 'products.json');
 
 export default class Product {
 
-    id : string = '';
+    id: string = '';
 
     constructor(
         public title: string,
