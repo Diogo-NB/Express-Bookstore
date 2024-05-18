@@ -51,8 +51,12 @@ export default class AdminController {
             req.body.price,
             req.body.productId
         );
-        updatedProduct.save();
-        res.redirect('/admin/products');
+        updatedProduct.save().then(() => res.redirect('/admin/products'));
+    }
+
+    static postDeleteProduct(req: any, res: any, _next: any) {
+        const productId = req.body.productId;
+        Product.deleteById(productId).then(() => res.redirect('/admin/products'));
     }
 
     static getProducts(_req: any, res: any, _next: any) {
