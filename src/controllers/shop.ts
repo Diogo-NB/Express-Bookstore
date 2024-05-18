@@ -35,10 +35,19 @@ export default class ShopController {
     }
 
     static getCart(_req: any, res: any, _next: any) {
-        res.render(
-            'shop/cart',
-            { pageTitle: 'Your Cart', path: '/cart' }
-        )
+        Cart.getProducts().then((cartProducts) => {
+            res.render(
+                'shop/cart',
+                {
+                    pageTitle: 'Your Cart',
+                    path: '/cart',
+                    cartProducts: cartProducts
+                }
+            )
+        }).catch((error) => {
+            console.log(error);
+            res.redirect('/');
+        });
     }
 
     static postCart(req: any, res: any, _next: any) {
@@ -51,6 +60,13 @@ export default class ShopController {
             }
         });
         res.redirect('/cart');
+    }
+
+    static postCartDeleteProduct(req: any, res: any, _next: any) {
+        const id = req.body.productId;
+        Cart.removeProduct(id).then(() => {
+            res.redirect('/cart');
+        }).catch(console.log);
     }
 
     static getCheckout(_req: any, res: any, _next: any) {

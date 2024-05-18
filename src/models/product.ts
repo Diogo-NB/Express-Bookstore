@@ -49,7 +49,7 @@ export default class Product {
             const products = await Product.fetchAll();
             const updatedProducts = products.filter(p => p.id !== id);
             await fs.writeFile(filePath, JSON.stringify(updatedProducts));
-            await Cart.deleteProduct(id);
+            await Cart.removeProduct(id);
         } catch (error) {
             console.log("Error when deleting product: ", error);
         }

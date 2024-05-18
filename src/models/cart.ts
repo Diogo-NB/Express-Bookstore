@@ -17,7 +17,7 @@ export default class Cart {
         private totalPrice: number
     ) { }
 
-    private static async fetchCart() {
+    private static async fetchCart(): Promise<Cart> {
 
         let cart: Cart;
 
@@ -34,6 +34,8 @@ export default class Cart {
 
         return cart;
     }
+
+    static async getProducts(): Promise<ProductInCart[]> { return (await Cart.fetchCart()).products; }
 
     private async saveCart() {
         const cart = this;
@@ -73,7 +75,7 @@ export default class Cart {
         await cart.saveCart();
     }
 
-    static async deleteProduct(productId: string) {
+    static async removeProduct(productId: string) {
         const cart = await Cart.fetchCart();
 
         const existingProductIndex = cart.products.findIndex(

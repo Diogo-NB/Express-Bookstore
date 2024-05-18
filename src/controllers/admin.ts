@@ -20,9 +20,7 @@ export default class AdminController {
             req.body.description,
             req.body.price
         );
-        product.save();
-
-        res.redirect('/admin/products');
+        product.save().then(() => res.redirect('/admin/products'));
     }
 
     static getEditProduct(req: any, res: any, _next: any) {
