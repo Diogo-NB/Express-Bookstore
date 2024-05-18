@@ -5,7 +5,11 @@ export default class AdminController {
     static getAddProduct(_req: any, res: any, _next: any) {
         res.render(
             'admin/edit-product',
-            { pageTitle: 'Add Product', path: '/admin/add-product' }
+            {
+                pageTitle: 'Add Product',
+                path: '/admin/add-product',
+                editing: false
+            }
         );
     }
 
@@ -22,10 +26,33 @@ export default class AdminController {
     }
 
     static getEditProduct(req: any, res: any, _next: any) {
-        res.render(
-            'admin/edit-product',
-            { pageTitle: 'Edit Product', path: '/admin/edit-product' },
+        const productId = req.params.productId as string;
+        Product.findById(productId).then((product) => {
+            if (!product) {
+                return res.redirect('/');
+            }
+            res.render(
+                'admin/edit-product',
+                {
+                    pageTitle: 'Edit Product',
+                    path: '/admin/edit-product',
+                    editing: true,
+                    product: product
+                },
+            );
+        });
+    }
+
+    static postEditProduct(req: any, res: any, _next: any) {
+        const updatedProduct = new Product(
+            req.body.title,
+            req.body.imageUrl,
+            req.body.description,
+            req.body.price,
+            req.body.productId
         );
+        updatedProduct.save();
+        res.redirect('/admin/products');
     }
 
     static getProducts(_req: any, res: any, _next: any) {

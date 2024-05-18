@@ -6,13 +6,12 @@ const filePath = path.join(path.dirname(rootDir), 'data', 'products.json');
 
 export default class Product {
 
-    id: string = '';
-
     constructor(
         public title: string,
         public imageUrl: string,
         public description: string,
-        public price: number
+        public price: number,
+        public id?: string | undefined,
     ) { }
 
     toString() {
@@ -20,11 +19,16 @@ export default class Product {
     }
 
     save() {
-        this.id = Math.random().toString();
         console.log('Saving product... ' + this.toString());
         fs.readFile(filePath).then((fileContent) => {
             let products = JSON.parse(fileContent.toString()) as Product[];
-            products.push(this);
+            if (this.id) {
+                const existingProductIndex = products.findIndex(p => p.id === this.id);
+                products[existingProductIndex] = this;
+            } else {
+                this.id = Math.random().toString();
+                products.push(this);
+            }
             fs.writeFile(filePath, JSON.stringify(products)).catch(console.log);
         }).catch(console.log);
     };
