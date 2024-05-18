@@ -59,8 +59,10 @@ export default class Product {
         try {
             const fileContent = await fs.readFile(filePath, 'utf-8');
             return JSON.parse(fileContent) as Product[];
-        } catch (message) {
-            console.log(message);
+        } catch (error) {
+            console.log('Error fetching products, returning an empty array and clearing cart ...');
+            console.log(error);
+            await Cart.clearCart();
             return [];
         }
     }
@@ -70,5 +72,3 @@ export default class Product {
     }
 
 }
-
-const products: Product[] = [];

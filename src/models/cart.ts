@@ -17,7 +17,7 @@ export default class Cart {
         private totalPrice: number
     ) { }
 
-    private static async getCart() {
+    private static async fetchCart() {
 
         let cart: Cart;
 
@@ -45,9 +45,14 @@ export default class Cart {
         }
     }
 
+    static async clearCart() {
+        const cart = new Cart([], 0);
+        await cart.saveCart();
+    }
+
     static async addProduct(product: Product) {
 
-        const cart = await Cart.getCart();
+        const cart = await Cart.fetchCart();
 
         const existingProductIndex = cart.products.findIndex(
             (p: ProductInCart) => p.product.id === product.id
@@ -69,7 +74,7 @@ export default class Cart {
     }
 
     static async deleteProduct(productId: string) {
-        const cart = await Cart.getCart();
+        const cart = await Cart.fetchCart();
 
         const existingProductIndex = cart.products.findIndex(
             (p: ProductInCart) => p.product.id === productId

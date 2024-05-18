@@ -22,7 +22,7 @@ export default class AdminController {
         );
         product.save();
 
-        res.redirect('/');
+        res.redirect('/admin/products');
     }
 
     static getEditProduct(req: any, res: any, _next: any) {
