@@ -1,12 +1,17 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import path from 'path';
-import rootDir from './util/path'
+import rootDir from './util/path';
+import db from "./util/database";
 
 import { router as adminRoutes } from './routes/admin';
 import { router as shopRoutes } from './routes/shop';
 
 const app = express();
+
+db.execute('SELECT * FROM products')
+    .then(console.log)
+    .catch(console.log);
 
 app.set('view engine', 'ejs');
 app.set('views', 'src/views');
