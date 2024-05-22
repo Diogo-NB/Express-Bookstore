@@ -1,9 +1,4 @@
-import path from 'path';
-import rootDir from '../util/path';
-import fs from 'fs/promises';
-import Cart from './cart';
-
-const filePath = path.join(path.dirname(rootDir), 'data', 'products.json');
+import db from '../util/database';
 
 export default class Product {
 
@@ -15,24 +10,26 @@ export default class Product {
         public id?: string | undefined,
     ) { }
 
+    static fromJson(json: any): Product {
+        const { title, imageUrl, description, price, id } = json;
+        return new Product(title, imageUrl, description, price, id);
+    }
+
     toString() {
         return `Title: ${this.title}\nImage URL: ${this.imageUrl}\nDescription: ${this.description}\nPrice: ${this.price}`;
     }
 
     async save() {
-        console.log(`Saving product...\n${this.toString()}`);
-        try {
-            const products = await Product.fetchAll();
-            if (this.id) {
-                const existingProductIndex = products.findIndex(p => p.id === this.id);
-                products[existingProductIndex] = this;
-            } else {
-                this.id = Math.random().toString();
-                products.push(this);
-            }
-            await fs.writeFile(filePath, JSON.stringify(products));
-        } catch (error) {
-            console.log(error);
+        if (this.id) {
+            await db.execute(
+                'UPDATE products SET title = ?, imageUrl = ?, description = ?, price = ? WHERE products.id = ?',
+                [this.title, this.imageUrl, this.description, this.price, this.id]
+            );
+        } else {
+            await db.execute(
+                'INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?)',
+                [this.title, this.imageUrl, this.description, this.price]
+            );
         }
     };
 
@@ -43,32 +40,19 @@ export default class Product {
     }
 
     static async deleteById(id: string) {
-        console.log('Deleting product... ');
-
-        try {
-            const products = await Product.fetchAll();
-            const updatedProducts = products.filter(p => p.id !== id);
-            await fs.writeFile(filePath, JSON.stringify(updatedProducts));
-            await Cart.removeProduct(id);
-        } catch (error) {
-            console.log("Error when deleting product: ", error);
-        }
+        await db.execute('DELETE FROM products WHERE products.id = ?', [id]);
     }
 
     static async fetchAll(): Promise<Product[]> {
-        try {
-            const fileContent = await fs.readFile(filePath, 'utf-8');
-            return JSON.parse(fileContent) as Product[];
-        } catch (error) {
-            console.log('Error fetching products, returning an empty array and clearing cart ...');
-            console.log(error);
-            await Cart.clearCart();
-            return [];
-        }
+        const [rows, fieldData] = await db.execute('SELECT * FROM products');
+        const products = (rows as any[]).map(Product.fromJson);
+        return products;
     }
 
     static async findById(id: string): Promise<Product | undefined> {
-        return (await Product.fetchAll()).find(p => p.id === id);
+        const [rows, fieldData] = await db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
+        const products = (rows as any[]).map(Product.fromJson);
+        return products.length > 0 ? products[0] : undefined;
     }
 
 }
