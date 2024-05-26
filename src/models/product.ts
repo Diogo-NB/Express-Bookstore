@@ -1,58 +1,77 @@
-import db from '../util/database';
+import { Document, ObjectId, WithId } from "mongodb";
+import { getDb } from "../util/database";
 
 export default class Product {
+  public _id?: ObjectId;
 
-    constructor(
-        public title: string,
-        public imageUrl: string,
-        public description: string,
-        public price: number,
-        public id?: string | undefined,
-    ) { }
-
-    static fromJson(json: any): Product {
-        const { title, imageUrl, description, price, id } = json;
-        return new Product(title, imageUrl, description, price, id);
+  constructor(
+    public title: string,
+    public imageUrl: string,
+    public description: string,
+    public price: number,
+    id?: string | ObjectId
+  ) {
+    if (id) {
+      this._id = typeof id === "string" ? ObjectId.createFromHexString(id) : id;
     }
+  }
 
-    toString() {
-        return `Title: ${this.title}\nImage URL: ${this.imageUrl}\nDescription: ${this.description}\nPrice: ${this.price}`;
+  toString() {
+    return `Title: ${this.title}\nImage URL: ${this.imageUrl}\nDescription: ${this.description}\nPrice: ${this.price}`;
+  }
+
+  static fromJson(json: WithId<Document>): Product {
+    const { _id, title, imageUrl, description, price } = json;
+    return new Product(title, imageUrl, description, price, _id);
+  }
+
+  async save() {
+    const operation = this._id
+      ? getDb()
+          .collection("products")
+          .updateOne({ _id: this._id }, { $set: this })
+      : getDb().collection("products").insertOne(this);
+
+    return operation
+      .then(() => console.log("Product saved!"))
+      .catch(console.log);
+  }
+
+  static async findById(id: ObjectId | string): Promise<Product | undefined> {
+    if (typeof id === "string") {
+      id = ObjectId.createFromHexString(id);
     }
-
-    async save() {
-        if (this.id) {
-            await db.execute(
-                'UPDATE products SET title = ?, imageUrl = ?, description = ?, price = ? WHERE products.id = ?',
-                [this.title, this.imageUrl, this.description, this.price, this.id]
-            );
-        } else {
-            await db.execute(
-                'INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?)',
-                [this.title, this.imageUrl, this.description, this.price]
-            );
+    return getDb()
+      .collection("products")
+      .findOne({ _id: id })
+      .then((product) => {
+        if (!product) {
+          return;
         }
-    };
+        return Product.fromJson(product);
+      });
+  }
 
-    async delete() {
-        if (this.id) {
-            await Product.deleteById(this.id);
-        }
+  static async fetchAll() {
+    return getDb()
+      .collection("products")
+      .find()
+      .toArray()
+      .then((products) => products.map(Product.fromJson));
+  }
+
+  async delete() {
+    if (this._id) Product.deleteById(this._id);
+  }
+
+  static async deleteById(id: ObjectId | string) {
+    if (typeof id === "string") {
+      id = ObjectId.createFromHexString(id);
     }
-
-    static async deleteById(id: string) {
-        await db.execute('DELETE FROM products WHERE products.id = ?', [id]);
-    }
-
-    static async fetchAll(): Promise<Product[]> {
-        const [rows, fieldData] = await db.execute('SELECT * FROM products');
-        const products = (rows as any[]).map(Product.fromJson);
-        return products;
-    }
-
-    static async findById(id: string): Promise<Product | undefined> {
-        const [rows, fieldData] = await db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-        const products = (rows as any[]).map(Product.fromJson);
-        return products.length > 0 ? products[0] : undefined;
-    }
-
+    return getDb()
+      .collection("products")
+      .deleteOne({ _id: id })
+      .then(() => console.log("Product deleted!"))
+      .catch(console.log);
+  }
 }
