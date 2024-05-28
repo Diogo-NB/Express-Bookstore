@@ -3,10 +3,13 @@ import bodyParser from "body-parser";
 import path from "path";
 import rootDir from "./util/path";
 
+import { Request } from "express";
+
 import { mongoConnect } from "./util/database";
 
 import { router as adminRoutes } from "./routes/admin";
 import { router as shopRoutes } from "./routes/shop";
+import User from "./models/user";
 
 const app = express();
 
@@ -27,6 +30,9 @@ app.use((req, res, next) => {
 
 // Create a local server to receive data from
 mongoConnect((client) => {
-  // console.log(client);
+  User.findById("665409a7cab48a918e678e48").then((user) => {
+    if (user) User.userLoggedOn = user;
+    console.log(user?.cart ?? '');
+  });
   app.listen(3000);
 });

@@ -3,16 +3,24 @@ import { getDb } from "../util/database";
 
 export default class Product {
   public _id?: ObjectId;
+  public _userId?: ObjectId;
 
   constructor(
     public title: string,
     public imageUrl: string,
     public description: string,
     public price: number,
-    id?: string | ObjectId
+    id?: ObjectId | string,
+    userId?: ObjectId | string
   ) {
     if (id) {
       this._id = typeof id === "string" ? ObjectId.createFromHexString(id) : id;
+    }
+    if (userId) {
+      this._userId =
+        typeof userId === "string"
+          ? ObjectId.createFromHexString(userId)
+          : userId;
     }
   }
 
@@ -21,8 +29,8 @@ export default class Product {
   }
 
   static fromJson(json: WithId<Document>): Product {
-    const { _id, title, imageUrl, description, price } = json;
-    return new Product(title, imageUrl, description, price, _id);
+    const { _id, title, imageUrl, description, price, _userId } = json;
+    return new Product(title, imageUrl, description, price, _id, _userId);
   }
 
   async save() {

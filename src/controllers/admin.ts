@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import Product from "../models/product";
+import User from "../models/user";
 
 export default class AdminController {
   static getAddProduct(_req: any, res: any, _next: any) {
@@ -15,7 +16,9 @@ export default class AdminController {
       req.body.title,
       req.body.imageUrl,
       req.body.description,
-      req.body.price
+      req.body.price,
+      undefined,
+      User.userLoggedOn._id
     );
     product.save().then(() => res.redirect("/admin/products"));
   }
