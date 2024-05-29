@@ -1,7 +1,6 @@
 import { Db, MongoClient } from "mongodb";
 
-const _mongodbUrl =
-  "mongodb+srv://AppUser:iMuzh8uZu9iQIK8z@dn-cluster.2wx04ik.mongodb.net/?retryWrites=true&w=majority&appName=DN-Cluster";
+const _mongodbUrl = process.env.MONGODB_URL ?? "mongodb+srv://";
 
 let _db: Db;
 

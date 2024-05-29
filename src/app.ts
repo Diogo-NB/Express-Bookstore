@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 import path from "path";
 import rootDir from "./util/path";
 
-import { Request } from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
 import { mongoConnect } from "./util/database";
 
