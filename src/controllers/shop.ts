@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import Cart from "../models/cart";
 import Product from "../models/product";
+import User from "../models/user";
 
 export default class ShopController {
   static getProducts(_req: any, res: any, _next: any) {
@@ -39,24 +40,29 @@ export default class ShopController {
   }
 
   static getCart(_req: any, res: any, _next: any) {
-    res.render("shop/cart", {
-      pageTitle: "Your Cart",
-      path: "/cart",
-      cartProducts: [],
+    User.userLoggedOn.cart.getCartProducts().then((cartProducts) => {
+      res.render("shop/cart", {
+        pageTitle: "Your Cart",
+        path: "/cart",
+        cartProducts: cartProducts,
+      });
     });
   }
 
-  // static postCart(req: any, res: any, _next: any) {
-  //     let id: string = req.body.productID;
-  //     Product.findById(id).then((product) => {
-  //         if (product) {
-  //             Cart.addProduct(product).then(() => {
-  //                 console.log('Product added to cart');
-  //             }).catch(console.log);
-  //         }
-  //     });
-  //     res.redirect('/cart');
-  // }
+  static postCart(req: any, res: any, _next: any) {
+    let id: string = req.body.productId;
+    Product.findById(id).then((product) => {
+      if (product) {
+        User.userLoggedOn
+          .addToCart(product)
+          .then(() => {
+            console.log("Product added to cart");
+          })
+          .catch(console.log);
+      }
+    });
+    res.redirect("/cart");
+  }
 
   static postCartDeleteProduct(req: any, res: any, _next: any) {
     const id = req.body.productId;

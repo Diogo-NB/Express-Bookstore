@@ -1,7 +1,8 @@
 import { Document, ObjectId, WithId } from "mongodb";
 import { getDb } from "../util/database";
 import Product from "./product";
-import Cart from "./cart";
+import Cart, { CartItem } from "./cart";
+import { CaaRecord } from "dns";
 
 export default class User {
   public _id?: ObjectId;
@@ -36,6 +37,27 @@ export default class User {
       : getDb().collection("users").insertOne(this);
 
     return operation.then(() => console.log("User saved!")).catch(console.log);
+  }
+
+  async addToCart(product: Product, quantity: number = 1) {
+    if (!product._id || quantity < 1) return;
+
+    const itemIndex = this.cart.items.findIndex((item) =>
+      item.productId.equals(product._id)
+    );
+
+    if (itemIndex < 0) {
+      // If not in cart
+      this.cart.items.push({ productId: product._id, qty: quantity });
+    } else {
+      // If in cart
+      this.cart.items[itemIndex].qty++;
+    }
+
+    // Update cart
+    getDb()
+      .collection("users")
+      .updateOne({ _id: this._id }, { $set: { cart: this.cart } });
   }
 
   static async findById(id: ObjectId | string): Promise<User | undefined> {

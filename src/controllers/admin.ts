@@ -60,7 +60,7 @@ export default class AdminController {
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
-        path: "admin/products",
+        path: "/admin/products",
       });
     });
   }

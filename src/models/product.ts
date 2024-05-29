@@ -60,6 +60,14 @@ export default class Product {
       });
   }
 
+  static async findByIds(ids: ObjectId[]) {
+    return getDb()
+      .collection("products")
+      .find({ _id: { $in: ids } })
+      .toArray()
+      .then((products) => products.map(Product.fromJson));
+  }
+
   static async fetchAll() {
     return getDb()
       .collection("products")
