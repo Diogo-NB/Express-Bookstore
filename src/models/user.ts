@@ -60,6 +60,16 @@ export default class User {
       .updateOne({ _id: this._id }, { $set: { cart: this.cart } });
   }
 
+  async deleteFromCart(productId: ObjectId | string) {
+    if (typeof productId === "string") {
+      productId = ObjectId.createFromHexString(productId);
+    }
+    const updatedCartItems = this.cart.items.filter(
+      (item) => item.productId === productId
+    );
+    
+  }
+
   static async findById(id: ObjectId | string): Promise<User | undefined> {
     if (typeof id === "string") {
       id = ObjectId.createFromHexString(id);
